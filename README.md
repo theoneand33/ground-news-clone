@@ -2,8 +2,6 @@
 
 # ground-news-clone
 
-Created in [T3 Code](https://t3.codes).
-
 News aggregator that groups headlines from 110 outlets into stories and shows how left, center and right outlets cover each one.
 
 ```
