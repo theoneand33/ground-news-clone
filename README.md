@@ -7,7 +7,9 @@ Created in [T3 Code](https://t3.codes).
 News aggregator that groups headlines from 110 outlets into stories and shows how left, center and right outlets cover each one.
 
 ```
-npm start        # serves on $PORT (default 3000), no dependencies
+npm install
+npm start        # builds the React UI (Vite) and serves it plus /api/stories on $PORT (default 3000)
+npm run dev      # UI with hot reload; proxies /api to `npm start` ($API, default http://localhost:3000)
 npm test
 ```
 

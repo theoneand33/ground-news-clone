@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3000;
 const TTL = 15 * 60 * 1000;
 const PER_SOURCE = 40;
 const SIMILARITY = 0.4;
+const DIST = path.join(__dirname, 'dist');
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' };
 
 const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
 const decode = (s) =>
@@ -112,11 +114,18 @@ if (require.main === module) {
     if (pathname === '/api/stories') {
       res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'public, max-age=60' });
       res.end(JSON.stringify(await getCache()));
-    } else if (pathname === '/') {
-      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-      fs.createReadStream(path.join(__dirname, 'index.html')).pipe(res);
     } else {
-      res.writeHead(404).end('Not found');
+      // Built React app from `vite build`; the containment check blocks ../ traversal.
+      const file = path.join(DIST, pathname === '/' ? 'index.html' : pathname);
+      if (!file.startsWith(DIST + path.sep)) return res.writeHead(404).end('Not found');
+      fs.readFile(file, (err, body) => {
+        if (err) return res.writeHead(404).end('Not found');
+        res.writeHead(200, {
+          'content-type': TYPES[path.extname(file)] || 'application/octet-stream',
+          'cache-control': pathname.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'no-cache',
+        });
+        res.end(body);
+      });
     }
   }).listen(PORT, () => console.log(`listening on :${PORT}`));
   getCache();
